@@ -1,393 +1,778 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumFX Signals - Advanced Cryptocurrency Trading Dashboard</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Vue 3 -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    
-    <style>
-        /* Custom animations */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>QuantumFX Signals - Advanced Cryptocurrency Trading Dashboard</title>
 
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
-        }
+		<!-- Tailwind CSS -->
+		<script src="https://cdn.tailwindcss.com"></script>
 
-        /* Glassmorphism effect */
-        .backdrop-blur-lg {
-            backdrop-filter: blur(16px);
-        }
+		<!-- Vue 3 -->
+		<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
+		<!-- Lucide Icons -->
+		<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-        }
+		<!-- Google Identity Services -->
+		<script src="https://accounts.google.com/gsi/client" async defer></script>
 
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #a855f7, #f97316);
-            border-radius: 4px;
-        }
+		<style>
+			/* Custom animations */
+			@keyframes float {
+				0%,
+				100% {
+					transform: translateY(0px);
+				}
+				50% {
+					transform: translateY(-10px);
+				}
+			}
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #9333ea, #ea580c);
-        }
+			.animate-float {
+				animation: float 3s ease-in-out infinite;
+			}
 
-        /* Pulse animation for loading */
-        .pulse-subtle {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
+			/* Glassmorphism effect */
+			.backdrop-blur-lg {
+				backdrop-filter: blur(16px);
+			}
 
-        /* Background pattern */
-        .bg-pattern {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-    </style>
-</head>
-<body>
-    <div id="app">
-        <div class="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-orange-600">
-            <!-- Background Pattern -->
-            <div class="absolute inset-0 bg-black/20"></div>
-            <div class="absolute inset-0 bg-pattern"></div>
-            
-            <div class="relative z-10 p-4 md:p-6">
-                <div class="max-w-7xl mx-auto">
-                    <!-- Header -->
-                    <div class="text-center mb-8">
-                        <div class="flex items-center justify-center mb-4">
-                            <div class="bg-gradient-to-r from-purple-400 to-orange-400 p-3 rounded-2xl mr-4">
-                                <i data-lucide="zap" class="w-8 h-8 text-white"></i>
-                            </div>
-                            <h1 class="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-purple-200 to-orange-200 bg-clip-text text-transparent">
-                                QuantumFX Signals
-                            </h1>
-                        </div>
-                        <p class="text-purple-200 text-lg md:text-xl max-w-2xl mx-auto">
-                            Advanced cryptocurrency trading signals powered by quantum algorithms
-                        </p>
-                    </div>
+			/* Custom scrollbar */
+			::-webkit-scrollbar {
+				width: 8px;
+			}
 
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                        <!-- Total Signals -->
-                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-purple-200 text-sm font-medium">Total Signals</p>
-                                    <p class="text-3xl font-bold text-white">{{ totalSignals }}</p>
-                                </div>
-                                <i data-lucide="activity" class="w-8 h-8 text-purple-300"></i>
-                            </div>
-                        </div>
+			::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 4px;
+			}
 
-                        <!-- Buy Signals -->
-                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-purple-200 text-sm font-medium">Buy Signals</p>
-                                    <p class="text-3xl font-bold text-green-400">{{ buySignals.length }}</p>
-                                </div>
-                                <i data-lucide="trending-up" class="w-8 h-8 text-green-400"></i>
-                            </div>
-                        </div>
+			::-webkit-scrollbar-thumb {
+				background: linear-gradient(to bottom, #a855f7, #f97316);
+				border-radius: 4px;
+			}
 
-                        <!-- Sell Signals -->
-                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-purple-200 text-sm font-medium">Sell Signals</p>
-                                    <p class="text-3xl font-bold text-red-400">{{ sellSignals.length }}</p>
-                                </div>
-                                <i data-lucide="trending-down" class="w-8 h-8 text-red-400"></i>
-                            </div>
-                        </div>
+			::-webkit-scrollbar-thumb:hover {
+				background: linear-gradient(to bottom, #9333ea, #ea580c);
+			}
 
-                        <!-- Connection Status -->
-                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-purple-200 text-sm font-medium">Status</p>
-                                    <p :class="isConnected ? 'text-green-400' : 'text-red-400'" class="text-lg font-bold">
-                                        {{ isConnected ? 'Connected' : 'Offline' }}
-                                    </p>
-                                </div>
-                                <i :data-lucide="isConnected ? 'wifi' : 'wifi-off'" 
-                                   :class="isConnected ? 'text-green-400' : 'text-red-400'" 
-                                   class="w-8 h-8"></i>
-                            </div>
-                        </div>
-                    </div>
+			/* Pulse animation for loading */
+			.pulse-subtle {
+				animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+			}
 
-                    <!-- Control Panel -->
-                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-8">
-                        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div class="flex items-center gap-4">
-                                <button
-                                    @click="refreshSignals"
-                                    :disabled="isLoading"
-                                    class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white rounded-xl hover:from-purple-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
-                                >
-                                    <i data-lucide="refresh-cw" :class="isLoading ? 'animate-spin' : ''" class="w-5 h-5"></i>
-                                    {{ isLoading ? 'Updating...' : 'Refresh Now' }}
-                                </button>
-                                
-                                <div class="text-purple-200">
-                                    <p class="text-sm">Next update in: <span class="font-mono font-bold text-white">{{ nextUpdate }}s</span></p>
-                                </div>
-                            </div>
+			/* Background pattern */
+			.bg-pattern {
+				background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+			}
 
-                            <div v-if="lastUpdated" class="flex items-center gap-2 text-purple-200">
-                                <i data-lucide="clock" class="w-4 h-4"></i>
-                                <span class="text-sm">Last updated: {{ formatTime(lastUpdated) }}</span>
-                            </div>
-                        </div>
-                    </div>
+			/* Price highlight animation */
+			@keyframes priceGlow {
+				0%, 100% {
+					box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+				}
+				50% {
+					box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+				}
+			}
 
-                    <!-- Error Message -->
-                    <div v-if="error" class="bg-red-500/20 backdrop-blur-lg border border-red-500/30 rounded-2xl p-6 mb-8">
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="wifi-off" class="w-6 h-6 text-red-400"></i>
-                            <div>
-                                <h3 class="text-red-400 font-semibold">Connection Error</h3>
-                                <p class="text-red-300 mt-1">{{ error }}</p>
-                            </div>
-                        </div>
-                    </div>
+			.price-highlight {
+				animation: priceGlow 2s ease-in-out infinite;
+			}
 
-                    <!-- Loading State -->
-                    <div v-if="isLoading && signals.length === 0" class="text-center py-16">
-                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-12 border border-white/20 inline-block">
-                            <i data-lucide="refresh-cw" class="w-12 h-12 animate-spin text-purple-300 mx-auto mb-4"></i>
-                            <p class="text-purple-200 text-lg">Loading quantum signals...</p>
-                        </div>
-                    </div>
+			/* Login animations */
+			@keyframes slideInUp {
+				from {
+					opacity: 0;
+					transform: translateY(30px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
 
-                    <!-- No Signals -->
-                    <div v-else-if="!isLoading && signals.length === 0" class="text-center py-16">
-                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-12 border border-white/20 inline-block">
-                            <i data-lucide="bar-chart-3" class="w-16 h-16 text-purple-300 mx-auto mb-4"></i>
-                            <h3 class="text-white text-xl font-semibold mb-2">No Signals Available</h3>
-                            <p class="text-purple-200">Waiting for quantum analysis to generate trading signals...</p>
-                        </div>
-                    </div>
+			.slide-in-up {
+				animation: slideInUp 0.6s ease-out;
+			}
 
-                    <!-- Signals Grid -->
-                    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        <div
-                            v-for="signal in signals"
-                            :key="`${signal.symbol}-${signal.timestamp}`"
-                            class="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl relative overflow-hidden"
-                        >
-                            <!-- Signal Header -->
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-3 h-3 rounded-full bg-gradient-to-r from-purple-400 to-orange-400 animate-pulse"></div>
-                                    <h3 class="text-xl font-bold text-white">{{ signal.symbol }}</h3>
-                                </div>
-                                <div :class="getSignalClasses(signal.signal)" class="px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
-                                    <i :data-lucide="getSignalIcon(signal.signal)" class="w-4 h-4"></i>
-                                    <span class="font-bold text-sm uppercase">{{ signal.signal }}</span>
-                                </div>
-                            </div>
+			/* Google Sign-In button styling */
+			.google-signin-btn {
+				transition: all 0.3s ease;
+			}
 
-                            <!-- Signal Details -->
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-purple-200 text-sm">Source:</span>
-                                    <span class="text-white font-medium capitalize">{{ signal.source.replace('_', ' ') }}</span>
-                                </div>
-                                
-                                <div class="flex justify-between items-center">
-                                    <span class="text-purple-200 text-sm">Time:</span>
-                                    <span class="text-white text-sm">{{ getRelativeTime(signal.timestamp) }}</span>
-                                </div>
-                                
-                                <div class="pt-3 border-t border-white/10">
-                                    <div class="flex items-center gap-2 text-xs text-purple-300">
-                                        <i data-lucide="clock" class="w-3 h-3"></i>
-                                        {{ formatTime(signal.timestamp) }}
-                                    </div>
-                                </div>
-                            </div>
+			.google-signin-btn:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-orange-600">
+				<!-- Background Pattern -->
+				<div class="absolute inset-0 bg-black/20"></div>
+				<div class="absolute inset-0 bg-pattern"></div>
 
-                            <!-- Hover Effect -->
-                            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/0 to-orange-500/0 group-hover:from-purple-500/10 group-hover:to-orange-500/10 rounded-2xl transition-all duration-300"></div>
-                        </div>
-                    </div>
+				<!-- Login View -->
+				<div v-if="!isAuthenticated" class="relative z-10 flex items-center justify-center min-h-screen p-4">
+					<div class="w-full max-w-md">
+						<!-- Login Card -->
+						<div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 slide-in-up">
+							<!-- Logo and Title -->
+							<div class="text-center mb-8">
+								<div class="flex items-center justify-center mb-6">
+									<div class="bg-gradient-to-r from-purple-400 to-orange-400 p-4 rounded-2xl animate-float">
+										<i data-lucide="zap" class="w-10 h-10 text-white"></i>
+									</div>
+								</div>
+								<h1 class="text-3xl font-bold bg-gradient-to-r from-white via-purple-200 to-orange-200 bg-clip-text text-transparent mb-2">
+									QuantumFX Signals
+								</h1>
+								<p class="text-purple-200 text-sm">Advanced cryptocurrency trading signals</p>
+							</div>
 
-                    <!-- Footer -->
-                    <div class="text-center mt-12 pt-8 border-t border-white/10">
-                        <p class="text-purple-300 text-sm">
-                            Powered by QuantumFX • Real-time cryptocurrency trading signals • Updates every minute
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+							<!-- Sign In Content -->
+							<div class="space-y-6">
+								<div class="text-center">
+									<h2 class="text-xl font-semibold text-white mb-2">Welcome Back</h2>
+									<p class="text-purple-200 text-sm">Sign in to access your trading signals</p>
+								</div>
 
-    <script>
-        const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
+								<!-- Google Sign-In Button -->
+								<div class="flex justify-center">
+									<div 
+										id="g_id_signin" 
+										class="google-signin-btn"
+										data-type="standard"
+										data-theme="filled_blue"
+										data-size="large"
+										data-text="signin_with"
+										data-shape="rectangular"
+										data-logo_alignment="left">
+									</div>
+								</div>
 
-        createApp({
-            setup() {
-                // Reactive state
-                const signals = ref([]);
-                const isLoading = ref(false);
-                const isConnected = ref(true);
-                const lastUpdated = ref(null);
-                const error = ref(null);
-                const nextUpdate = ref(60);
+								<!-- Loading State -->
+								<div v-if="authLoading" class="text-center py-4">
+									<i data-lucide="loader-2" class="w-6 h-6 animate-spin text-purple-300 mx-auto mb-2"></i>
+									<p class="text-purple-200 text-sm">Signing you in...</p>
+								</div>
 
-                // API configuration
-                const API_BASE_URL = 'http://localhost:5000'; // Your Flask backend URL
-                const POLL_INTERVAL = 60000; // 1 minute
+								<!-- Error Message -->
+								<div v-if="authError" class="bg-red-500/20 border border-red-500/30 rounded-xl p-4">
+									<div class="flex items-center gap-3">
+										<i data-lucide="alert-circle" class="w-5 h-5 text-red-400"></i>
+										<div>
+											<p class="text-red-400 text-sm font-medium">Authentication Failed</p>
+											<p class="text-red-300 text-xs mt-1">{{ authError }}</p>
+										</div>
+									</div>
+								</div>
 
-                let pollInterval = null;
-                let countdownInterval = null;
+								<!-- Features Preview -->
+								<div class="space-y-3 pt-4 border-t border-white/10">
+									<div class="flex items-center gap-3 text-purple-200">
+										<i data-lucide="trending-up" class="w-4 h-4 text-green-400"></i>
+										<span class="text-sm">Real-time trading signals</span>
+									</div>
+									<div class="flex items-center gap-3 text-purple-200">
+										<i data-lucide="shield-check" class="w-4 h-4 text-blue-400"></i>
+										<span class="text-sm">Secure Google authentication</span>
+									</div>
+									<div class="flex items-center gap-3 text-purple-200">
+										<i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i>
+										<span class="text-sm">Quantum-powered algorithms</span>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                // Computed properties
-                const buySignals = computed(() => signals.value.filter(s => s.signal === 'buy'));
-                const sellSignals = computed(() => signals.value.filter(s => s.signal === 'sell'));
-                const totalSignals = computed(() => signals.value.length);
+						<!-- Footer -->
+						<div class="text-center mt-6">
+							<p class="text-purple-300 text-xs">Powered by QuantumFX • Secure & Private</p>
+						</div>
+					</div>
+				</div>
 
-                // Fetch signals from API
-                const fetchSignals = async () => {
-                    try {
-                        isLoading.value = true;
-                        error.value = null;
-                        
-                        const response = await fetch(`${API_BASE_URL}/signals`);
-                        
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        
-                        const data = await response.json();
-                        signals.value = data || [];
-                        lastUpdated.value = new Date();
-                        isConnected.value = true;
-                        nextUpdate.value = 60;
-                        
-                        // Re-initialize Lucide icons for new elements
-                        setTimeout(() => {
-                            lucide.createIcons();
-                        }, 100);
-                        
-                    } catch (err) {
-                        console.error('Error fetching signals:', err);
-                        error.value = err.message;
-                        isConnected.value = false;
-                    } finally {
-                        isLoading.value = false;
-                    }
-                };
+				<!-- Dashboard View -->
+				<div v-else class="relative z-10 p-4 md:p-6">
+					<div class="max-w-7xl mx-auto">
+						<!-- Header with User Info -->
+						<div class="text-center mb-8">
+							<div class="flex items-center justify-between mb-4">
+								<!-- Logo and Title -->
+								<div class="flex items-center">
+									<div class="bg-gradient-to-r from-purple-400 to-orange-400 p-3 rounded-2xl mr-4">
+										<i data-lucide="zap" class="w-8 h-8 text-white"></i>
+									</div>
+									<div class="text-left">
+										<h1 class="text-2xl md:text-4xl font-bold bg-gradient-to-r from-white via-purple-200 to-orange-200 bg-clip-text text-transparent">
+											QuantumFX Signals
+										</h1>
+										<p class="text-purple-200 text-sm">Welcome back, {{ userInfo.name || userInfo.email }}</p>
+									</div>
+								</div>
 
-                // Manual refresh
-                const refreshSignals = () => {
-                    fetchSignals();
-                };
+								<!-- User Menu -->
+								<div class="flex items-center gap-4">
+									<div class="bg-white/10 backdrop-blur-lg rounded-xl p-3 border border-white/20">
+										<div class="flex items-center gap-3">
+											<img 
+												v-if="userInfo.picture" 
+												:src="userInfo.picture" 
+												:alt="userInfo.name"
+												class="w-8 h-8 rounded-full border-2 border-white/30"
+											>
+											<div v-else class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-orange-400 flex items-center justify-center">
+												<i data-lucide="user" class="w-4 h-4 text-white"></i>
+											</div>
+											<div class="text-left hidden md:block">
+												<p class="text-white text-sm font-medium">{{ userInfo.name || 'User' }}</p>
+												<p class="text-purple-200 text-xs">{{ userInfo.email }}</p>
+											</div>
+										</div>
+									</div>
+									<button 
+										@click="logout"
+										class="bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl p-3 transition-all duration-300"
+										title="Logout"
+									>
+										<i data-lucide="log-out" class="w-5 h-5 text-red-400"></i>
+									</button>
+								</div>
+							</div>
+							<p class="text-purple-200 text-lg md:text-xl max-w-2xl mx-auto">Advanced cryptocurrency trading signals powered by quantum algorithms</p>
+						</div>
 
-                // Format timestamp
-                const formatTime = (timestamp) => {
-                    return new Date(timestamp).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                };
+						<!-- Stats Cards -->
+						<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+							<!-- Total Signals -->
+							<div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+								<div class="flex items-center justify-between">
+									<div>
+										<p class="text-purple-200 text-sm font-medium">Total Signals</p>
+										<p class="text-3xl font-bold text-white">{{ totalSignals }}</p>
+									</div>
+									<i data-lucide="activity" class="w-8 h-8 text-purple-300"></i>
+								</div>
+							</div>
 
-                // Format relative time
-                const getRelativeTime = (timestamp) => {
-                    const now = new Date();
-                    const signalTime = new Date(timestamp);
-                    const diffInMinutes = Math.floor((now - signalTime) / (1000 * 60));
-                    
-                    if (diffInMinutes < 1) return 'Just now';
-                    if (diffInMinutes === 1) return '1 minute ago';
-                    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
-                    
-                    const diffInHours = Math.floor(diffInMinutes / 60);
-                    if (diffInHours === 1) return '1 hour ago';
-                    return `${diffInHours} hours ago`;
-                };
+							<!-- Buy Signals -->
+							<div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+								<div class="flex items-center justify-between">
+									<div>
+										<p class="text-purple-200 text-sm font-medium">Buy Signals</p>
+										<p class="text-3xl font-bold text-green-400">{{ buySignals.length }}</p>
+									</div>
+									<i data-lucide="trending-up" class="w-8 h-8 text-green-400"></i>
+								</div>
+							</div>
 
-                // Get signal classes
-                const getSignalClasses = (signal) => {
-                    return signal === 'buy' 
-                        ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white'
-                        : 'bg-gradient-to-r from-red-400 to-rose-500 text-white';
-                };
+							<!-- Sell Signals -->
+							<div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+								<div class="flex items-center justify-between">
+									<div>
+										<p class="text-purple-200 text-sm font-medium">Sell Signals</p>
+										<p class="text-3xl font-bold text-red-400">{{ sellSignals.length }}</p>
+									</div>
+									<i data-lucide="trending-down" class="w-8 h-8 text-red-400"></i>
+								</div>
+							</div>
 
-                // Get signal icon
-                const getSignalIcon = (signal) => {
-                    return signal === 'buy' ? 'trending-up' : 'trending-down';
-                };
+							<!-- Connection Status -->
+							<div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+								<div class="flex items-center justify-between">
+									<div>
+										<p class="text-purple-200 text-sm font-medium">Status</p>
+										<p :class="isConnected ? 'text-green-400' : 'text-red-400'" class="text-lg font-bold">{{ isConnected ? 'Connected' : 'Offline' }}</p>
+									</div>
+									<i :data-lucide="isConnected ? 'wifi' : 'wifi-off'" :class="isConnected ? 'text-green-400' : 'text-red-400'" class="w-8 h-8"></i>
+								</div>
+							</div>
+						</div>
 
-                // Countdown timer
-                const startCountdown = () => {
-                    countdownInterval = setInterval(() => {
-                        if (nextUpdate.value > 0) {
-                            nextUpdate.value--;
-                        } else {
-                            nextUpdate.value = 60;
-                        }
-                    }, 1000);
-                };
+						<!-- Control Panel -->
+						<div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-8">
+							<div class="flex flex-col md:flex-row items-center justify-between gap-4">
+								<div class="flex items-center gap-4">
+									<button
+										@click="refreshSignals"
+										:disabled="isLoading"
+										class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white rounded-xl hover:from-purple-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
+									>
+										<i data-lucide="refresh-cw" :class="isLoading ? 'animate-spin' : ''" class="w-5 h-5"></i>
+										{{ isLoading ? 'Updating...' : 'Refresh Now' }}
+									</button>
 
-                // Lifecycle hooks
-                onMounted(() => {
-                    // Initialize Lucide icons
-                    lucide.createIcons();
-                    
-                    // Fetch initial data
-                    fetchSignals();
-                    
-                    // Set up intervals
-                    pollInterval = setInterval(fetchSignals, POLL_INTERVAL);
-                    startCountdown();
-                });
+									<div class="text-purple-200">
+										<p class="text-sm">Next update in: <span class="font-mono font-bold text-white">{{ nextUpdate }}s</span></p>
+									</div>
+								</div>
 
-                onUnmounted(() => {
-                    if (pollInterval) clearInterval(pollInterval);
-                    if (countdownInterval) clearInterval(countdownInterval);
-                });
+								<div v-if="lastUpdated" class="flex items-center gap-2 text-purple-200">
+									<i data-lucide="clock" class="w-4 h-4"></i>
+									<span class="text-sm">Last updated: {{ formatTime(lastUpdated) }}</span>
+								</div>
+							</div>
+						</div>
 
-                return {
-                    signals,
-                    isLoading,
-                    isConnected,
-                    lastUpdated,
-                    error,
-                    nextUpdate,
-                    buySignals,
-                    sellSignals,
-                    totalSignals,
-                    refreshSignals,
-                    formatTime,
-                    getRelativeTime,
-                    getSignalClasses,
-                    getSignalIcon
-                };
-            }
-        }).mount('#app');
-    </script>
-</body>
+						<!-- Error Message -->
+						<div v-if="error" class="bg-red-500/20 backdrop-blur-lg border border-red-500/30 rounded-2xl p-6 mb-8">
+							<div class="flex items-center gap-3">
+								<i data-lucide="wifi-off" class="w-6 h-6 text-red-400"></i>
+								<div>
+									<h3 class="text-red-400 font-semibold">Connection Error</h3>
+									<p class="text-red-300 mt-1">{{ error }}</p>
+									<button 
+										v-if="error.includes('Unauthorized') || error.includes('Token')"
+										@click="logout"
+										class="mt-2 text-red-400 underline text-sm hover:text-red-300"
+									>
+										Sign in again
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Loading State -->
+						<div v-if="isLoading && signals.length === 0" class="text-center py-16">
+							<div class="bg-white/10 backdrop-blur-lg rounded-2xl p-12 border border-white/20 inline-block">
+								<i data-lucide="refresh-cw" class="w-12 h-12 animate-spin text-purple-300 mx-auto mb-4"></i>
+								<p class="text-purple-200 text-lg">Loading quantum signals...</p>
+							</div>
+						</div>
+
+						<!-- No Signals -->
+						<div v-else-if="!isLoading && signals.length === 0" class="text-center py-16">
+							<div class="bg-white/10 backdrop-blur-lg rounded-2xl p-12 border border-white/20 inline-block">
+								<i data-lucide="bar-chart-3" class="w-16 h-16 text-purple-300 mx-auto mb-4"></i>
+								<h3 class="text-white text-xl font-semibold mb-2">No Signals Available</h3>
+								<p class="text-purple-200">Waiting for quantum analysis to generate trading signals...</p>
+							</div>
+						</div>
+
+						<!-- Signals Grid -->
+						<div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+							<div
+								v-for="signal in signals"
+								:key="`${signal.symbol}-${signal.timestamp}`"
+								class="group bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl relative overflow-hidden"
+							>
+								<!-- Signal Header -->
+								<div class="flex items-center justify-between mb-4">
+									<div class="flex items-center gap-2">
+										<div class="w-3 h-3 rounded-full bg-gradient-to-r from-purple-400 to-orange-400 animate-pulse"></div>
+										<h3 class="text-xl font-bold text-white">{{ signal.symbol }}</h3>
+									</div>
+									<div :class="getSignalClasses(signal.signal)" class="px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
+										<i :data-lucide="getSignalIcon(signal.signal)" class="w-4 h-4"></i>
+										<span class="font-bold text-sm uppercase">{{ signal.signal }}</span>
+									</div>
+								</div>
+
+								<!-- Price Display -->
+								<div class="mb-4 p-4 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-xl border border-yellow-400/30 price-highlight">
+									<div class="flex items-center justify-between">
+										<div class="flex items-center gap-2">
+											<i data-lucide="dollar-sign" class="w-5 h-5 text-yellow-400"></i>
+											<span class="text-yellow-200 text-sm font-medium">{{ signal.signal === 'buy' ? 'Buy at:' : 'Sell at:' }}</span>
+										</div>
+										<div class="text-right">
+											<p class="text-2xl font-bold text-yellow-300">${{ formatPrice(signal.price) }}</p>
+											<p class="text-xs text-yellow-400 opacity-75">Target Price</p>
+										</div>
+									</div>
+								</div>
+
+								<!-- Signal Details -->
+								<div class="space-y-3">
+									<div class="flex justify-between items-center">
+										<span class="text-purple-200 text-sm">Source:</span>
+										<span class="text-white font-medium capitalize">{{ signal.source.replace('_', ' ') }}</span>
+									</div>
+
+									<div class="flex justify-between items-center">
+										<span class="text-purple-200 text-sm">Time:</span>
+										<span class="text-white text-sm">{{ getRelativeTime(signal.timestamp) }}</span>
+									</div>
+
+									<div class="pt-3 border-t border-white/10">
+										<div class="flex items-center gap-2 text-xs text-purple-300">
+											<i data-lucide="clock" class="w-3 h-3"></i>
+											{{ formatTime(signal.timestamp) }}
+										</div>
+									</div>
+								</div>
+
+								<!-- Action Recommendation -->
+								<div class="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
+									<div class="flex items-center gap-2">
+										<i data-lucide="info" class="w-4 h-4 text-blue-400"></i>
+										<span class="text-blue-200 text-sm">
+											{{ signal.signal === 'buy' ? 'Consider buying' : 'Consider selling' }} {{ signal.symbol }} at ${{ formatPrice(signal.price) }}
+										</span>
+									</div>
+								</div>
+
+								<!-- Hover Effect -->
+								<div
+									class="absolute inset-0 bg-gradient-to-r from-purple-500/0 to-orange-500/0 group-hover:from-purple-500/10 group-hover:to-orange-500/10 rounded-2xl transition-all duration-300"
+								></div>
+							</div>
+						</div>
+
+						<!-- Footer -->
+						<div class="text-center mt-12 pt-8 border-t border-white/10">
+							<p class="text-purple-300 text-sm">Powered by QuantumFX • Real-time cryptocurrency trading signals • Updates every minute</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
+
+			createApp({
+				setup() {
+					// Authentication state
+					const isAuthenticated = ref(false);
+					const authLoading = ref(false);
+					const authError = ref(null);
+					const userInfo = ref({});
+					const accessToken = ref(null);
+
+					// Signals state
+					const signals = ref([]);
+					const isLoading = ref(false);
+					const isConnected = ref(true);
+					const lastUpdated = ref(null);
+					const error = ref(null);
+					const nextUpdate = ref(60);
+
+					// API configuration
+					const API_BASE_URL = 'http://localhost:5000';
+					const GOOGLE_CLIENT_ID = '33683592746-i4tsodlj5qmtu184i346qq10j4bc9dli.apps.googleusercontent.com';
+					const POLL_INTERVAL = 60000; // 1 minute
+
+					let pollInterval = null;
+					let countdownInterval = null;
+
+					// Computed properties
+					const buySignals = computed(() => signals.value.filter((s) => s.signal === 'buy'));
+					const sellSignals = computed(() => signals.value.filter((s) => s.signal === 'sell'));
+					const totalSignals = computed(() => signals.value.length);
+
+					// Authentication functions
+					const initializeGoogleSignIn = () => {
+						if (window.google) {
+							window.google.accounts.id.initialize({
+								client_id: GOOGLE_CLIENT_ID,
+								callback: handleGoogleSignIn,
+								auto_select: false,
+								cancel_on_tap_outside: false
+							});
+
+							window.google.accounts.id.renderButton(
+								document.getElementById('g_id_signin'),
+								{
+									theme: 'filled_blue',
+									size: 'large',
+									type: 'standard',
+									text: 'signin_with',
+									shape: 'rectangular',
+									logo_alignment: 'left'
+								}
+							);
+						}
+					};
+
+					const handleGoogleSignIn = async (response) => {
+						authLoading.value = true;
+						authError.value = null;
+
+						try {
+							const backendResponse = await fetch(`${API_BASE_URL}/auth/google`, {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json',
+								},
+								body: JSON.stringify({
+									id_token: response.credential
+								})
+							});
+
+							if (!backendResponse.ok) {
+								throw new Error('Authentication failed');
+							}
+
+							const data = await backendResponse.json();
+							accessToken.value = data.access_token;
+
+							// Store token in localStorage
+							localStorage.setItem('access_token', data.access_token);
+
+							// Decode JWT to get user info (basic decode, not verification)
+							const tokenPayload = JSON.parse(atob(data.access_token.split('.')[1]));
+							userInfo.value = {
+								email: tokenPayload.email,
+								name: tokenPayload.name || tokenPayload.email.split('@')[0],
+								picture: tokenPayload.picture
+							};
+
+							isAuthenticated.value = true;
+
+							// Start fetching signals
+							await fetchSignals();
+							startPolling();
+
+						} catch (err) {
+							console.error('Authentication error:', err);
+							authError.value = err.message || 'Authentication failed. Please try again.';
+						} finally {
+							authLoading.value = false;
+						}
+					};
+
+					const logout = () => {
+						// Clear all auth data
+						isAuthenticated.value = false;
+						accessToken.value = null;
+						userInfo.value = {};
+						signals.value = [];
+						error.value = null;
+
+						// Clear localStorage
+						localStorage.removeItem('access_token');
+
+						// Stop polling
+						stopPolling();
+
+						// Sign out from Google
+						if (window.google) {
+							window.google.accounts.id.disableAutoSelect();
+						}
+					};
+
+					const checkExistingAuth = async () => {
+						const token = localStorage.getItem('access_token');
+						if (!token) return;
+
+						try {
+							// Verify token by making a test API call
+							const response = await fetch(`${API_BASE_URL}/signals`, {
+								headers: {
+									'Authorization': `Bearer ${token}`
+								}
+							});
+
+							if (response.ok) {
+								accessToken.value = token;
+								
+								// Decode JWT to get user info
+								const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+								userInfo.value = {
+									email: tokenPayload.email,
+									name: tokenPayload.name || tokenPayload.email.split('@')[0],
+									picture: tokenPayload.picture
+								};
+
+								isAuthenticated.value = true;
+								
+								// Fetch initial signals
+								const data = await response.json();
+								signals.value = data || [];
+								lastUpdated.value = new Date();
+								
+								startPolling();
+							} else {
+								// Token is invalid, remove it
+								localStorage.removeItem('access_token');
+							}
+						} catch (err) {
+							console.error('Token verification failed:', err);
+							localStorage.removeItem('access_token');
+						}
+					};
+
+					// API functions
+					const fetchSignals = async () => {
+						if (!accessToken.value) return;
+
+						try {
+							isLoading.value = true;
+							error.value = null;
+
+							const response = await fetch(`${API_BASE_URL}/signals`, {
+								headers: {
+									'Authorization': `Bearer ${accessToken.value}`
+								}
+							});
+
+							if (response.status === 401) {
+								// Token expired or invalid
+								logout();
+								return;
+							}
+
+							if (!response.ok) {
+								throw new Error(`HTTP error! status: ${response.status}`);
+							}
+
+							const data = await response.json();
+							signals.value = data || [];
+							lastUpdated.value = new Date();
+							isConnected.value = true;
+							nextUpdate.value = 60;
+
+							// Re-initialize Lucide icons for new elements
+							setTimeout(() => {
+								lucide.createIcons();
+							}, 100);
+						} catch (err) {
+							console.error('Error fetching signals:', err);
+							error.value = err.message;
+							isConnected.value = false;
+							
+							// If it's an auth error, logout
+							if (err.message.includes('401') || err.message.includes('Unauthorized')) {
+								logout();
+							}
+						} finally {
+							isLoading.value = false;
+						}
+					};
+
+					const refreshSignals = () => {
+						fetchSignals();
+					};
+
+					// Polling functions
+					const startPolling = () => {
+						if (pollInterval) clearInterval(pollInterval);
+						if (countdownInterval) clearInterval(countdownInterval);
+
+						pollInterval = setInterval(fetchSignals, POLL_INTERVAL);
+						startCountdown();
+					};
+
+					const stopPolling = () => {
+						if (pollInterval) clearInterval(pollInterval);
+						if (countdownInterval) clearInterval(countdownInterval);
+					};
+
+					const startCountdown = () => {
+						countdownInterval = setInterval(() => {
+							if (nextUpdate.value > 0) {
+								nextUpdate.value--;
+							} else {
+								nextUpdate.value = 60;
+							}
+						}, 1000);
+					};
+
+					// Utility functions
+					const formatPrice = (price) => {
+						if (!price) return '0.00';
+						
+						const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+						
+						if (numPrice >= 1000) {
+							return numPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+						} else if (numPrice >= 1) {
+							return numPrice.toFixed(2);
+						} else {
+							return numPrice.toFixed(6);
+						}
+					};
+
+					const formatTime = (timestamp) => {
+						return new Date(timestamp).toLocaleTimeString('en-US', {
+							hour: '2-digit',
+							minute: '2-digit',
+							second: '2-digit',
+						});
+					};
+
+					const getRelativeTime = (timestamp) => {
+						const now = new Date();
+						const signalTime = new Date(timestamp);
+						const diffInMinutes = Math.floor((now - signalTime) / (1000 * 60));
+
+						if (diffInMinutes < 1) return 'Just now';
+						if (diffInMinutes === 1) return '1 minute ago';
+						if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+
+						const diffInHours = Math.floor(diffInMinutes / 60);
+						if (diffInHours === 1) return '1 hour ago';
+						return `${diffInHours} hours ago`;
+					};
+
+					const getSignalClasses = (signal) => {
+						return signal === 'buy' ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white' : 'bg-gradient-to-r from-red-400 to-rose-500 text-white';
+					};
+
+					const getSignalIcon = (signal) => {
+						return signal === 'buy' ? 'trending-up' : 'trending-down';
+					};
+
+					// Lifecycle hooks
+					onMounted(async () => {
+						// Initialize Lucide icons
+						lucide.createIcons();
+
+						// Check for existing authentication
+						await checkExistingAuth();
+
+						// Initialize Google Sign-In if not authenticated
+						if (!isAuthenticated.value) {
+							// Wait for Google script to load
+							const checkGoogleLoaded = () => {
+								if (window.google) {
+									initializeGoogleSignIn();
+								} else {
+									setTimeout(checkGoogleLoaded, 100);
+								}
+							};
+							checkGoogleLoaded();
+						}
+					});
+
+					onUnmounted(() => {
+						stopPolling();
+					});
+
+					return {
+						// Authentication
+						isAuthenticated,
+						authLoading,
+						authError,
+						userInfo,
+						logout,
+						
+						// Signals
+						signals,
+						isLoading,
+						isConnected,
+						lastUpdated,
+						error,
+						nextUpdate,
+						buySignals,
+						sellSignals,
+						totalSignals,
+						refreshSignals,
+						
+						// Utilities
+						formatPrice,
+						formatTime,
+						getRelativeTime,
+						getSignalClasses,
+						getSignalIcon,
+					};
+				},
+			}).mount('#app');
+		</script>
+	</body>
 </html>
