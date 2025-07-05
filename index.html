@@ -4,6 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>QuantumFX Signals - Advanced Cryptocurrency Trading Dashboard</title>
+		<meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
 
 		<!-- Tailwind CSS -->
 		<script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +16,7 @@
 		<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
 		<!-- Google Identity Services -->
-		<script src="https://accounts.google.com/gsi/client" async defer></script>
+		<script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleScript"></script>
 
 		<style>
 			/* Custom animations */
@@ -433,6 +434,11 @@
 		</div>
 
 		<script>
+			// Global function to handle Google script loading
+			window.initGoogleScript = function() {
+				console.log('Google Identity Services loaded');
+			};
+
 			const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 			createApp({
@@ -468,24 +474,35 @@
 					// Authentication functions
 					const initializeGoogleSignIn = () => {
 						if (window.google) {
+							// Clear any existing button
+							const signInDiv = document.getElementById('g_id_signin');
+							if (signInDiv) {
+								signInDiv.innerHTML = '';
+							}
+
 							window.google.accounts.id.initialize({
 								client_id: GOOGLE_CLIENT_ID,
 								callback: handleGoogleSignIn,
 								auto_select: false,
-								cancel_on_tap_outside: false
+								cancel_on_tap_outside: false,
+								use_fedcm_for_prompt: false,
+								ux_mode: 'popup'  // Use popup mode to avoid COOP issues
 							});
 
-							window.google.accounts.id.renderButton(
-								document.getElementById('g_id_signin'),
-								{
-									theme: 'filled_blue',
-									size: 'large',
-									type: 'standard',
-									text: 'signin_with',
-									shape: 'rectangular',
-									logo_alignment: 'left'
+							setTimeout(() => {
+								const buttonContainer = document.getElementById('g_id_signin');
+								if (buttonContainer) {
+									window.google.accounts.id.renderButton(buttonContainer, {
+										theme: 'filled_blue',
+										size: 'large',
+										type: 'standard',
+										text: 'signin_with',
+										shape: 'rectangular',
+										logo_alignment: 'left',
+										width: 250
+									});
 								}
-							);
+							}, 50);
 						}
 					};
 
@@ -543,6 +560,7 @@
 						userInfo.value = {};
 						signals.value = [];
 						error.value = null;
+						authError.value = null;
 
 						// Clear localStorage
 						localStorage.removeItem('access_token');
@@ -554,6 +572,12 @@
 						if (window.google) {
 							window.google.accounts.id.disableAutoSelect();
 						}
+
+						// Re-initialize Google Sign-In button after a short delay
+						setTimeout(() => {
+							initializeGoogleSignIn();
+							lucide.createIcons(); // Re-initialize icons
+						}, 100);
 					};
 
 					const checkExistingAuth = async () => {
